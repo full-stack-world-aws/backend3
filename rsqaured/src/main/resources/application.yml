@@ -1,0 +1,52 @@
+server:
+  port: 8080
+#server:
+#  port: ${PORT:8080}
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://database-ranpak-1.cirmux2wfkck.us-east-1.rds.amazonaws.com:3306/appreciate
+    username: admin
+    password: vVAldVxDvKunWvulIEHi
+  jpa:
+    # Show or not log for each sql query; useful for development.
+    showSql: true
+    hibernate:
+      ddlAuto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL57Dialect
+    open-in-view: false
+
+ranpak:
+  fileSystemRoot: /data/ranpak
+  fileUploads:
+    fileSystemRoot: ${ranpak.fileSystemRoot}
+    productImagesLocation: public/products/images/
+    productFilesLocation: public/products/files/
+    
+aws:
+  s3bucketName: rsqaured
+
+#spring:
+#  datasource:
+#    driverClassName: com.mysql.jdbc.Driver
+#    url: jdbc:mysql://localhost:3336/appreciate
+#    username: appreciate_dev
+#    password: abcd1234
+#  jpa:
+#    # Show or not log for each sql query; useful for development.
+#    showSql: true
+#    hibernate:
+#      ddlAuto: none
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.MySQL57Dialect
+#    open-in-view: false
+#
+#ranpak:
+#  fileSystemRoot: /data/ranpak
+#  fileUploads:
+#    fileSystemRoot: ${ranpak.fileSystemRoot}
+#    productImagesLocation: public/products/images/
+#    productFilesLocation: public/products/files/
