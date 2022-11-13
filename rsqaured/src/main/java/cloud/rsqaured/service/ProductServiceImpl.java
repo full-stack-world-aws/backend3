@@ -24,14 +24,9 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
-
     private final ProductRepository productRepository;
     private final AuthenticatedUserResolver authenticatedUserResolver;
     private final StorageService storageService;
-    @Value("${ranpak.fileUploads.productImagesLocation}")
-    private String productImageLocation;
-    @Value("${ranpak.fileUploads.productFilesLocation}")
-    private String productFileLocation;
     static final String FILE = "file";
     static final String ANY_FILE = "anyFile";
 

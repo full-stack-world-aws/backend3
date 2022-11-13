@@ -12,6 +12,5 @@ public interface StorageService {
     
     String generatePresignedUrl(String key);
     
-    byte[] readS3ObjectAsBytes(String key) throws IOException;
 
 }

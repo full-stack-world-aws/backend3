@@ -32,45 +32,19 @@ public class ProductController {
     public ResponseEntity<List<Product>> get() {
         return new ResponseEntity<>(productService.get(), HttpStatus.OK);
     }
-
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Product> delete(
             @PathVariable Integer id
     ) {
         return new ResponseEntity<>(productService.delete(id), HttpStatus.OK);
     }
-
-//    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<Product> createOrUpdateProduct(MultipartHttpServletRequest request) {
-//        String jsonMetadata = request.getParameter(METADATA_PARAMETER_NAME);
-//        MultipartFile multipartFile = request.getFile(FILE);
-//        try {
-//            System.out.println(multipartFile.getOriginalFilename());
-//            return new ResponseEntity<>(
-//                    productService.createOrUpdateProduct(
-//                            objectMapper.readValue(jsonMetadata, Product.class),
-//                            multipartFile
-//                    ),
-//                    HttpStatus.CREATED
-//            );
-//        } catch (IOException e) {
-//            throw new GeneralMessageException(e.getMessage());
-//        }
-//    }
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Product> createOrUpdateProduct(MultipartHttpServletRequest request) {
         return new ResponseEntity<>(productService.createOrUpdateProduct(request), HttpStatus.CREATED);
     }
-
-
     @GetMapping(value = "/{filename}")
     public String getPresignedUrl(@PathVariable String filename) {
         return storageService.generatePresignedUrl(filename);
-    }
-
-    @GetMapping(value = "/getbyte/{filename}")
-    public byte[] getS3ByteArray(@PathVariable String filename) throws IOException {
-        return storageService.readS3ObjectAsBytes(filename);
     }
 
 }

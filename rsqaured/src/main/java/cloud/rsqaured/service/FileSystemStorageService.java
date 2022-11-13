@@ -72,15 +72,6 @@ public class FileSystemStorageService implements StorageService {
 		System.out.println("Pre-Signed URL: " + url.toString());
 		return url.toString();
 	}
-
-	@Override
-	public byte[] readS3ObjectAsBytes(String key) throws IOException {
-		S3Object object = s3.getObject(s3bucketName, key); 
-		byte[] byteArray = IOUtils.toByteArray(object.getObjectContent());
-		return byteArray;
-	}
-
-
 	@PostConstruct
 	private void initAPI() {
 		s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1)
