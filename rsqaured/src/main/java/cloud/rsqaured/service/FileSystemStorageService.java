@@ -30,11 +30,14 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import utilities.os.OperatingSystemPathway;
 
+import javax.annotation.PostConstruct;
+
 @Service
 public class FileSystemStorageService implements StorageService {
 
 	@Value("${aws.s3bucketName}")
 	private String s3bucketName;
+	private AmazonS3 s3;
 	@Override
 	public void store(byte[] data, String fileName) throws IOException {
 
@@ -49,12 +52,7 @@ public class FileSystemStorageService implements StorageService {
 
 	@Override
 	public void delete(String key) throws IOException {
-		AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1)
-				.withCredentials(new AWSStaticCredentialsProvider(
-						new BasicAWSCredentials("AKIAW4TLEAE3BUYNZKN3", "YyIgVphgaiazSQRgDYDr3DwtuvhSi8hR64autxuX")))
-				.build();
 		s3.deleteObject(s3bucketName, key);
-
 	}
 	@Override
 	public String generatePresignedUrl(String key) {
@@ -63,11 +61,6 @@ public class FileSystemStorageService implements StorageService {
 		long expTimeMillis = expiration.getTime();
 		expTimeMillis += 1000 * 60 * 60;
 		expiration.setTime(expTimeMillis);
-		
-		AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1)
-				.withCredentials(new AWSStaticCredentialsProvider(
-						new BasicAWSCredentials("AKIAW4TLEAE3BUYNZKN3", "YyIgVphgaiazSQRgDYDr3DwtuvhSi8hR64autxuX")))
-				.build();
 
 		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(s3bucketName, key)
 				.withMethod(HttpMethod.GET).withExpiration(expiration);
@@ -78,14 +71,17 @@ public class FileSystemStorageService implements StorageService {
 
 	@Override
 	public byte[] readS3ObjectAsBytes(String key) throws IOException {
-		AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1)
+		S3Object object = s3.getObject(s3bucketName, key); 
+		byte[] byteArray = IOUtils.toByteArray(object.getObjectContent());
+		return byteArray;
+	}
+
+
+	@PostConstruct
+	private void initAPI() {
+		s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1)
 				.withCredentials(new AWSStaticCredentialsProvider(
 						new BasicAWSCredentials("AKIAW4TLEAE3BUYNZKN3", "YyIgVphgaiazSQRgDYDr3DwtuvhSi8hR64autxuX")))
 				.build();
-		
-		S3Object object = s3.getObject(s3bucketName, key); 
-		byte[] byteArray = IOUtils.toByteArray(object.getObjectContent());
-		// TODO Auto-generated method stub
-		return byteArray;
 	}
 }
