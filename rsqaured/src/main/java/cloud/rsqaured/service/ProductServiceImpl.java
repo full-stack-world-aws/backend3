@@ -8,6 +8,7 @@ import cloud.rsqaured.persistence.entity.ProductEntity;
 import cloud.rsqaured.persistence.entity.UserEntity;
 import cloud.rsqaured.persistence.repository.ProductRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,31 +22,21 @@ import java.util.List;
 import java.util.Objects;
 
 @Service
+@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final AuthenticatedUserResolver authenticatedUserResolver;
     private final StorageService storageService;
-    private final String productImageLocation;
-    private final String productFileLocation;
+    @Value("${ranpak.fileUploads.productImagesLocation}")
+    private String productImageLocation;
+    @Value("${ranpak.fileUploads.productFilesLocation}")
+    private String productFileLocation;
     static final String FILE = "file";
     static final String ANY_FILE = "anyFile";
 
     static final String METADATA_PARAMETER_NAME = "meta-data";
 
-    @Autowired
-    public ProductServiceImpl(ProductRepository productRepository,
-                              AuthenticatedUserResolver authenticatedUserResolver,
-                              StorageService storageService,
-                              @Value("${ranpak.fileUploads.productImagesLocation}") String productImageLocation,
-                              @Value("${ranpak.fileUploads.productFilesLocation}") String productFileLocation
-    ) {
-        this.productRepository = productRepository;
-        this.authenticatedUserResolver = authenticatedUserResolver;
-        this.storageService = storageService;
-        this.productImageLocation = productImageLocation;
-        this.productFileLocation = productFileLocation;
-    }
 
     @Override
     public List<Product> get() {
