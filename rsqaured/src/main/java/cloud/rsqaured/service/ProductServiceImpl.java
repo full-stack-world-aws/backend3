@@ -8,6 +8,7 @@ import cloud.rsqaured.persistence.entity.ProductEntity;
 import cloud.rsqaured.persistence.entity.UserEntity;
 import cloud.rsqaured.persistence.repository.ProductRepository;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -77,9 +78,9 @@ public class ProductServiceImpl implements ProductService {
 
         if (nonNull(imageData) && imageData.length > 0) {
             try {
-                
-                storageService.store(imageData, fileName);
-                productEntity.setImageLocation(fileName);
+                String finalFileName = RandomStringUtils.random(8,true,false) + fileName;
+                storageService.store(imageData, finalFileName);
+                productEntity.setImageLocation(finalFileName);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
