@@ -37,12 +37,16 @@ public class FileSystemStorageService implements StorageService {
 
 	@Value("${aws.s3bucketName}")
 	private String s3bucketName;
+	@Value("${aws.accessKeyId}")
+	private String accessKeyId;
+	@Value("${aws.secretAccessKey}")
+	private String secretAccessKey;
 	private AmazonS3 s3;
 	@Override
 	public void store(byte[] data, String fileName) throws IOException {
 
-		AwsBasicCredentials awsCreds = AwsBasicCredentials.create("AKIAW4TLEAE3BUYNZKN3",
-				"YyIgVphgaiazSQRgDYDr3DwtuvhSi8hR64autxuX");
+		AwsBasicCredentials awsCreds = AwsBasicCredentials.create(accessKeyId,
+				secretAccessKey);
 		Region region = Region.US_EAST_1;
 		S3Client s3 = S3Client.builder().region(region).credentialsProvider(StaticCredentialsProvider.create(awsCreds))
 				.build();
@@ -81,7 +85,7 @@ public class FileSystemStorageService implements StorageService {
 	private void initAPI() {
 		s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1)
 				.withCredentials(new AWSStaticCredentialsProvider(
-						new BasicAWSCredentials("AKIAW4TLEAE3BUYNZKN3", "YyIgVphgaiazSQRgDYDr3DwtuvhSi8hR64autxuX")))
+						new BasicAWSCredentials(accessKeyId,secretAccessKey)))
 				.build();
 	}
 }
