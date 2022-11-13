@@ -1,0 +1,16 @@
+version: "3.7"
+services:
+  db:
+    platform: linux/x86_64
+    image: mysql:8.0.28
+    restart: "no"
+    environment:
+      MYSQL_DATABASE: 'appreciate' # So you don't have to use root, but you can ifs you likes
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
+      MYSQL_USER: 'appreciate_dev'
+      MYSQL_PASSWORD: 'abcd1234'
+    ports: # <Port exposed> : < MySQL Port running inside container>
+      - '3336:3306'
+    expose: # Opens port 3326 on the container
+      - '3336' # Where our data will be persisted
+    #TODO: make it so it creates both mysql and java app from
