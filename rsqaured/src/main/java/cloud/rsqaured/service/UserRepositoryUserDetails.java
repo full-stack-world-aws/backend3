@@ -44,7 +44,6 @@ public class UserRepositoryUserDetails implements UserDetails {
         return userEntity.getEmail();
     }
 
-    // TODO: How are these used? Do we need new rows in 'user'?
     @Override
     public boolean isAccountNonExpired() {
         return true;
