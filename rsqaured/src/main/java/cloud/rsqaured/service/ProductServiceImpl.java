@@ -7,6 +7,7 @@ import cloud.rsqaured.model.Product;
 import cloud.rsqaured.persistence.entity.ProductEntity;
 import cloud.rsqaured.persistence.entity.UserEntity;
 import cloud.rsqaured.persistence.repository.ProductRepository;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,12 +46,14 @@ public class ProductServiceImpl implements ProductService {
         return Product.productsFrom(productEntityList);
     }
 
+    @SneakyThrows
     @Override
     public Product delete(Integer integer){
         UserEntity userEntity = authenticatedUserResolver.user(); // runs through security context
         ProductEntity productEntity = productRepository.findById(integer).orElse(null);
         if(Objects.isNull(productEntity)) throw new GeneralMessageWithIdException("product does not exist with the following id", integer);
         if(productEntity.getUserEntity().getId() != userEntity.getId()) throw new GeneralMessageException("You are not the user that created this product");
+        if(Objects.nonNull(productEntity.getImageLocation())) storageService.delete(productEntity.getImageLocation());
         productRepository.delete(productEntity);
         return Product.builder().id(0).build();
     }

@@ -33,16 +33,8 @@ import utilities.os.OperatingSystemPathway;
 @Service
 public class FileSystemStorageService implements StorageService {
 
-	private final String fileSystemRoot;
-
 	@Value("${aws.s3bucketName}")
 	private String s3bucketName;
-
-	public FileSystemStorageService(@Value("${ranpak.fileUploads.fileSystemRoot}") String fileSystemRoot) {
-		fileSystemRoot = OperatingSystemPathway.macOsFilePathSinceRootUnwritable(fileSystemRoot);
-		this.fileSystemRoot = fileSystemRoot;
-	}
-
 	@Override
 	public void store(byte[] data, String fileName) throws IOException {
 
@@ -56,30 +48,14 @@ public class FileSystemStorageService implements StorageService {
 	}
 
 	@Override
-	public void delete(String bucketName, String key) throws IOException {
+	public void delete(String key) throws IOException {
 		AmazonS3 s3 = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1)
 				.withCredentials(new AWSStaticCredentialsProvider(
 						new BasicAWSCredentials("AKIAW4TLEAE3BUYNZKN3", "YyIgVphgaiazSQRgDYDr3DwtuvhSi8hR64autxuX")))
 				.build();
-		s3.deleteObject(bucketName, key);
+		s3.deleteObject(s3bucketName, key);
 
 	}
-
-	@Override
-	public byte[] readBytes(String from) throws IOException {
-		return Files.readAllBytes(get(fileSystemRoot, from));
-	}
-
-	@Override
-	public InputStream getInputStream(String from) throws IOException {
-		return Files.newInputStream(get(fileSystemRoot, from), READ);
-	}
-
-	@Override
-	public File getFile(String from) throws IOException {
-		return new File(get(fileSystemRoot, from).toString());
-	}
-
 	@Override
 	public String generatePresignedUrl(String key) {
 		// Set the expiry time
@@ -92,7 +68,7 @@ public class FileSystemStorageService implements StorageService {
 				.withCredentials(new AWSStaticCredentialsProvider(
 						new BasicAWSCredentials("AKIAW4TLEAE3BUYNZKN3", "YyIgVphgaiazSQRgDYDr3DwtuvhSi8hR64autxuX")))
 				.build();
-		
+
 		GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(s3bucketName, key)
 				.withMethod(HttpMethod.GET).withExpiration(expiration);
 		URL url = s3.generatePresignedUrl(generatePresignedUrlRequest);

@@ -8,13 +8,7 @@ public interface StorageService {
 
     void store(byte[] data, String fileName) throws IOException;
 
-    void delete(String bucketName, String key) throws IOException;
-
-    byte[] readBytes(String from) throws IOException;
-
-    InputStream getInputStream(String from) throws IOException;
-
-    File getFile(String from) throws IOException;
+    void delete(String key) throws IOException;
     
     String generatePresignedUrl(String key);
     
