@@ -11,8 +11,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,10 +27,7 @@ public class ProductServiceImpl implements ProductService {
     private final StorageService storageService;
     static final String FILE = "file";
     static final String ANY_FILE = "anyFile";
-
     static final String METADATA_PARAMETER_NAME = "meta-data";
-
-
     @Override
     public List<Product> get() {
         UserEntity userEntity = authenticatedUserResolver.user(); // runs through security context
