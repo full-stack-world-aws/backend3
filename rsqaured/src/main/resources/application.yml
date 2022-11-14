@@ -27,8 +27,6 @@ ranpak:
 
 aws:
   s3bucketName: rsqaured
-  accessKeyId: AKIAW4TLEAE3BUYNZKN3
-  secretAccessKey: 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
 
 #spring:
 #  datasource:

@@ -28,6 +28,7 @@ public class ProductServiceImpl implements ProductService {
     static final String FILE = "file";
     static final String ANY_FILE = "anyFile";
     static final String METADATA_PARAMETER_NAME = "meta-data";
+
     @Override
     public List<Product> get() {
         UserEntity userEntity = authenticatedUserResolver.user(); // runs through security context
@@ -62,24 +63,31 @@ public class ProductServiceImpl implements ProductService {
         ProductEntity productEntity = createOrUpdateProductEntityFrom(product);
 
         MultipartFile imageMultipartFile = request.getFile(FILE); // image
-        if(Objects.nonNull(imageMultipartFile)) productEntity.setImageLocation(
-                createFileName(imageMultipartFile)
-        );
-
         MultipartFile anyMultipartFile = request.getFile(ANY_FILE); // any file
-        if (Objects.nonNull(anyMultipartFile)) productEntity.setFileLocation(
-                createFileName(anyMultipartFile)
-        );
 
-        ProductEntity productEntityAfterSave = productRepository.save(productEntity);
+        if (Objects.isNull(productEntity.getId())) {
+            if (Objects.nonNull(imageMultipartFile)) productEntity.setImageLocation(createFileName(imageMultipartFile));
 
-        if(Objects.nonNull(productEntityAfterSave.getImageLocation()))
-            storeInS3Bucket(imageMultipartFile, productEntityAfterSave.getImageLocation());
+            if (Objects.nonNull(anyMultipartFile)) productEntity.setFileLocation(createFileName(anyMultipartFile));
 
-        if(Objects.nonNull(productEntityAfterSave.getFileLocation()))
-            storeInS3Bucket(anyMultipartFile, productEntityAfterSave.getFileLocation());
+            ProductEntity productEntityAfterSave = productRepository.save(productEntity);
 
-        return Product.productFrom(productEntityAfterSave);
+            if (Objects.nonNull(productEntityAfterSave.getImageLocation())) storeInS3Bucket(imageMultipartFile, productEntityAfterSave.getImageLocation());
+            if (Objects.nonNull(productEntityAfterSave.getFileLocation())) storeInS3Bucket(anyMultipartFile, productEntityAfterSave.getFileLocation());
+
+            return Product.productFrom(productEntityAfterSave);
+        }else{
+            if (Objects.nonNull(product.getImageLocation()) && Objects.nonNull(imageMultipartFile)) productEntity.setImageLocation(createFileName(imageMultipartFile));
+
+            if (Objects.nonNull(product.getFileLocation()) && Objects.nonNull(anyMultipartFile)) productEntity.setFileLocation(createFileName(anyMultipartFile));
+
+            ProductEntity productEntityAfterSave = productRepository.save(productEntity);
+
+            if (Objects.nonNull(product.getImageLocation()) && Objects.nonNull(productEntityAfterSave.getImageLocation())) storeInS3Bucket(imageMultipartFile, productEntityAfterSave.getImageLocation());
+            if (Objects.nonNull(product.getFileLocation()) && Objects.nonNull(productEntityAfterSave.getFileLocation())) storeInS3Bucket(anyMultipartFile, productEntityAfterSave.getFileLocation());
+
+            return Product.productFrom(productEntityAfterSave);
+        }
     }
 
     private ProductEntity createOrUpdateProductEntityFrom(Product product) {
@@ -92,7 +100,8 @@ public class ProductServiceImpl implements ProductService {
         if (Objects.nonNull(product.getCountry())) productEntity.setCountry(product.getCountry());
         if (Objects.nonNull(product.getInfo())) productEntity.setInfo(product.getInfo());
         if (Objects.nonNull(product.getName())) productEntity.setName(product.getName());
-        if (Objects.nonNull(product.getReferenceNumber())) productEntity.setReferenceNumber(product.getReferenceNumber());
+        if (Objects.nonNull(product.getReferenceNumber()))
+            productEntity.setReferenceNumber(product.getReferenceNumber());
 
         productEntity.setUserEntity(userEntity);
         return productEntity;
@@ -110,10 +119,12 @@ public class ProductServiceImpl implements ProductService {
 
     @SneakyThrows
     private void storeInS3Bucket(MultipartFile multipartFile, String finalFileName) {
-        if(multipartFile.getBytes().length < 0) throw new GeneralMessageException("Something is wrong with a file you uploaded");
+        if (multipartFile.getBytes().length < 0)
+            throw new GeneralMessageException("Something is wrong with a file you uploaded");
         storageService.store(multipartFile.getBytes(), finalFileName);
     }
-    private String createFileName(MultipartFile multipartFile){
+
+    private String createFileName(MultipartFile multipartFile) {
         return RandomStringUtils.random(8, true, false) + multipartFile.getOriginalFilename();
     }
 }
