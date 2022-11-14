@@ -66,25 +66,24 @@ public class ProductServiceImpl implements ProductService {
         MultipartFile anyMultipartFile = request.getFile(ANY_FILE); // any file
 
         if (Objects.isNull(productEntity.getId())) {
-            if (Objects.nonNull(imageMultipartFile)) productEntity.setImageLocation(createFileName(imageMultipartFile));
 
+            if (Objects.nonNull(imageMultipartFile)) productEntity.setImageLocation(createFileName(imageMultipartFile));
             if (Objects.nonNull(anyMultipartFile)) productEntity.setFileLocation(createFileName(anyMultipartFile));
 
             ProductEntity productEntityAfterSave = productRepository.save(productEntity);
 
-            if (Objects.nonNull(productEntityAfterSave.getImageLocation())) storeInS3Bucket(imageMultipartFile, productEntityAfterSave.getImageLocation());
-            if (Objects.nonNull(productEntityAfterSave.getFileLocation())) storeInS3Bucket(anyMultipartFile, productEntityAfterSave.getFileLocation());
+            if (Objects.nonNull(imageMultipartFile)) storeInS3Bucket(imageMultipartFile, productEntityAfterSave.getImageLocation());
+            if (Objects.nonNull(anyMultipartFile)) storeInS3Bucket(anyMultipartFile, productEntityAfterSave.getFileLocation());
 
             return Product.productFrom(productEntityAfterSave);
         }else{
-            if (Objects.nonNull(product.getImageLocation()) && Objects.nonNull(imageMultipartFile)) productEntity.setImageLocation(createFileName(imageMultipartFile));
-
-            if (Objects.nonNull(product.getFileLocation()) && Objects.nonNull(anyMultipartFile)) productEntity.setFileLocation(createFileName(anyMultipartFile));
+            if (Objects.nonNull(imageMultipartFile) && Objects.nonNull(imageMultipartFile)) productEntity.setImageLocation(createFileName(imageMultipartFile));
+            if (Objects.nonNull(anyMultipartFile) && Objects.nonNull(anyMultipartFile)) productEntity.setFileLocation(createFileName(anyMultipartFile));
 
             ProductEntity productEntityAfterSave = productRepository.save(productEntity);
 
-            if (Objects.nonNull(product.getImageLocation()) && Objects.nonNull(productEntityAfterSave.getImageLocation())) storeInS3Bucket(imageMultipartFile, productEntityAfterSave.getImageLocation());
-            if (Objects.nonNull(product.getFileLocation()) && Objects.nonNull(productEntityAfterSave.getFileLocation())) storeInS3Bucket(anyMultipartFile, productEntityAfterSave.getFileLocation());
+            if (Objects.nonNull(imageMultipartFile) && Objects.nonNull(productEntityAfterSave.getImageLocation())) storeInS3Bucket(imageMultipartFile, productEntityAfterSave.getImageLocation());
+            if (Objects.nonNull(anyMultipartFile) && Objects.nonNull(productEntityAfterSave.getFileLocation())) storeInS3Bucket(anyMultipartFile, productEntityAfterSave.getFileLocation());
 
             return Product.productFrom(productEntityAfterSave);
         }
@@ -119,8 +118,7 @@ public class ProductServiceImpl implements ProductService {
 
     @SneakyThrows
     private void storeInS3Bucket(MultipartFile multipartFile, String finalFileName) {
-        if (multipartFile.getBytes().length < 0)
-            throw new GeneralMessageException("Something is wrong with a file you uploaded");
+        if (multipartFile.getBytes().length < 0) throw new GeneralMessageException("Something is wrong with a file you uploaded");
         storageService.store(multipartFile.getBytes(), finalFileName);
     }
 
