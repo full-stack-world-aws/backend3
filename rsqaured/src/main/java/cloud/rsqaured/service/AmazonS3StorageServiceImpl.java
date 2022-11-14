@@ -1,13 +1,9 @@
 package cloud.rsqaured.service;
 
 import static java.nio.file.Paths.get;
-import static java.nio.file.StandardOpenOption.READ;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Files;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,7 +26,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import javax.annotation.PostConstruct;
 
 @Service
-public class FileSystemStorageService implements StorageService {
+public class AmazonS3StorageServiceImpl implements AmazonS3StorageService {
 
 	@Value("${aws.s3bucketName}")
 	private String s3bucketName;

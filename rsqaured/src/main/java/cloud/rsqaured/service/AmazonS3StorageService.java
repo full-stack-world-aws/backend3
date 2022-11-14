@@ -1,10 +1,8 @@
 package cloud.rsqaured.service;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
-public interface StorageService {
+public interface AmazonS3StorageService {
 
     void store(byte[] data, String fileName) throws IOException;
 

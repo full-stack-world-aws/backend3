@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -24,7 +23,7 @@ import java.util.Objects;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final AuthenticatedUserResolver authenticatedUserResolver;
-    private final StorageService storageService;
+    private final AmazonS3StorageService amazonS3StorageService;
     static final String FILE = "file";
     static final String ANY_FILE = "anyFile";
     static final String METADATA_PARAMETER_NAME = "meta-data";
@@ -45,8 +44,8 @@ public class ProductServiceImpl implements ProductService {
             throw new GeneralMessageWithIdException("product does not exist with the following id", integer);
         if (productEntity.getUserEntity().getId() != userEntity.getId())
             throw new GeneralMessageException("You are not the user that created this product");
-        if (Objects.nonNull(productEntity.getImageLocation())) storageService.delete(productEntity.getImageLocation());
-        if (Objects.nonNull(productEntity.getFileLocation())) storageService.delete(productEntity.getFileLocation());
+        if (Objects.nonNull(productEntity.getImageLocation())) amazonS3StorageService.delete(productEntity.getImageLocation());
+        if (Objects.nonNull(productEntity.getFileLocation())) amazonS3StorageService.delete(productEntity.getFileLocation());
         productRepository.delete(productEntity);
         return Product.builder().id(0).build();
     }
@@ -119,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
     @SneakyThrows
     private void storeInS3Bucket(MultipartFile multipartFile, String finalFileName) {
         if (multipartFile.getBytes().length < 0) throw new GeneralMessageException("Something is wrong with a file you uploaded");
-        storageService.store(multipartFile.getBytes(), finalFileName);
+        amazonS3StorageService.store(multipartFile.getBytes(), finalFileName);
     }
 
     private String createFileName(MultipartFile multipartFile) {
