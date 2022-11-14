@@ -62,18 +62,23 @@ public class ProductServiceImpl implements ProductService {
         ProductEntity productEntity = createOrUpdateProductEntityFrom(product);
 
         MultipartFile imageMultipartFile = request.getFile(FILE); // image
-        if (Objects.nonNull(imageMultipartFile)) {
-            String finalFileName = storeInS3BucketAndReturnFileName(imageMultipartFile);
-            productEntity.setImageLocation(finalFileName);
-        }
+        if(Objects.nonNull(imageMultipartFile)) productEntity.setImageLocation(
+                createFileName(imageMultipartFile)
+        );
 
         MultipartFile anyMultipartFile = request.getFile(ANY_FILE); // any file
-        if (Objects.nonNull(anyMultipartFile)) {
-            String finalFileName = storeInS3BucketAndReturnFileName(anyMultipartFile);
-            productEntity.setFileLocation(finalFileName);
-        }
+        if (Objects.nonNull(anyMultipartFile)) productEntity.setFileLocation(
+                createFileName(anyMultipartFile)
+        );
 
         ProductEntity productEntityAfterSave = productRepository.save(productEntity);
+
+        if(Objects.nonNull(productEntityAfterSave.getImageLocation()))
+            storeInS3Bucket(imageMultipartFile, productEntityAfterSave.getImageLocation());
+
+        if(Objects.nonNull(productEntityAfterSave.getFileLocation()))
+            storeInS3Bucket(anyMultipartFile, productEntityAfterSave.getFileLocation());
+
         return Product.productFrom(productEntityAfterSave);
     }
 
@@ -104,10 +109,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @SneakyThrows
-    private String storeInS3BucketAndReturnFileName(MultipartFile multipartFile) {
-        if (multipartFile.getBytes().length < 0) throw new GeneralMessageException("Something is wrong with a file you uploaded");
-        String finalFileName = RandomStringUtils.random(8, true, false) + multipartFile.getOriginalFilename();
+    private void storeInS3Bucket(MultipartFile multipartFile, String finalFileName) {
+        if(multipartFile.getBytes().length < 0) throw new GeneralMessageException("Something is wrong with a file you uploaded");
         storageService.store(multipartFile.getBytes(), finalFileName);
-        return finalFileName;
+    }
+    private String createFileName(MultipartFile multipartFile){
+        return RandomStringUtils.random(8, true, false) + multipartFile.getOriginalFilename();
     }
 }
