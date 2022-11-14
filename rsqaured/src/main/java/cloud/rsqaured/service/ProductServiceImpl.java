@@ -51,8 +51,8 @@ public class ProductServiceImpl implements ProductService {
         return Product.builder().id(0).build();
     }
 
+//    @Transactional
     @SneakyThrows
-    @Transactional
     @Override
     public Product createOrUpdateProduct(MultipartHttpServletRequest request) {
 
