@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import utilities.os.OperatingSystemPathway;
 
 @Configuration
 public class StaticResourceConfiguration extends WebMvcConfigurerAdapter {
@@ -21,7 +20,7 @@ public class StaticResourceConfiguration extends WebMvcConfigurerAdapter {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-        fileSystemRoot = OperatingSystemPathway.macOsFilePathSinceRootUnwritable(fileSystemRoot);
+//        fileSystemRoot = OperatingSystemPathway.macOsFilePathSinceRootUnwritable(fileSystemRoot);
 
         registry.addResourceHandler("/public/products/images/**")
                 .addResourceLocations("file:" + fileSystemRoot + "/" + productImagesLocation);
