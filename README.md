@@ -11,6 +11,7 @@ go into folder db and run the latest version of the database to create tables
 go into folder db -> scripts and copy the sql statement in appreciate_client_provisioning to initialize oauth 2 and basic authorization
 you will need my aws accessKeyId and secretAccessKey in order to perform storage actions
 so please ask and do not submit them anywhere
+inside application.yml comment spring.url.jdbc and replace it with a local instance
 
 
 
